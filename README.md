@@ -1,34 +1,25 @@
-<p align="center">
-  <img src="assets/martenwatch-mascot.webp" width="144" alt="Martenwatch pine marten mascot" />
-</p>
-
+<p align="center"><img src="assets/martenwatch-mascot.webp" width="144" alt="Martenwatch pine marten mascot" /></p>
 <h1 align="center">Martenwatch</h1>
-<p align="center"><strong>A checkpoint for agent actions.</strong></p>
-<p align="center">An experimental action ledger for simulated invoices, human review, and recovery.</p>
-<p align="center">
-  <a href="#how-it-works">How it works</a> ·
-  <a href="#run-locally">Get started</a> ·
-  <a href="#evidence-and-limits">Evidence &amp; limits</a> ·
-  <a href="docs/ARCHITECTURE.md">Architecture</a> ·
-  <a href="SECURITY.md">Security</a>
-</p>
-<p align="center"><img alt="Status: local prototype" src="https://img.shields.io/badge/status-local%20prototype-c65c16" /> <img alt="Runtime: Node 24+" src="https://img.shields.io/badge/node-24%2B-49664b" /> <img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-485564" /></p>
+<h3 align="center">A checkpoint for agent actions.</h3>
+<p align="center">An experimental action ledger for simulated invoices, human review, and recovery.<br />A small system for exploring what an agent can request—and what the server must decide.</p>
+<p align="center"><img alt="Status: local prototype" src="https://img.shields.io/badge/status-local%20prototype-c65c16" /> <img alt="Node 24 or newer" src="https://img.shields.io/badge/node-24%2B-49664b" /> <img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-485564" /></p>
+<p align="center"><a href="#how-it-works">How it works</a> · <a href="#get-started">Get started</a> · <a href="#run-the-labs">Run the labs</a> · <a href="#status-and-limits">Status &amp; limits</a> · <a href="docs/ARCHITECTURE.md">Architecture</a></p>
 
 > [!WARNING]
-> **Local research prototype.** Use synthetic data only. The default demo has no real authentication; do not expose it to the internet or use it for actual payments.
+> **Local research prototype.** Use synthetic data only. The default demo has no real authentication or production tenant isolation. Do not expose it to the internet or use it for actual payments.
 
-Martenwatch (previously ActionLedger ONE) explores a narrow question: **what happens when an agent requests an action that requires human approval?** A deterministic backend checks a simulated invoice before a worker records a simulated effect. Amounts strictly above **€500** require review; exactly €500 does not. No money moves.
+Martenwatch (previously ActionLedger ONE) explores a narrow question: **what happens when an agent requests an action that needs human approval?** The server checks a simulated invoice before a worker records a simulated effect. Amounts **over €500** require review; exactly €500 does not. No money moves.
 
-| Agent tools | Human review | Recovery lab | Evidence |
+| Tool requests | Human review | Recovery | Evidence |
 | --- | --- | --- | --- |
-| Local MCP and SDK experiments route simulated tool calls through a gateway. | The server independently checks the invoice state. | Tests exercise process interruption, retries, and parallel local workers. | Local events, traces, security datasets, and reproducible tests show what happened. |
+| Local MCP and SDK experiments send simulated requests through a gateway. | A server-side rule checks the invoice independently of model output. | Local tests exercise interrupted processes, retries and parallel workers. | Events, traces and reproducible experiments show what the prototype did. |
 
 ## How it works
 
 1. **Propose:** create a synthetic invoice and request a simulated action.
-2. **Check:** the server evaluates the amount and blocks actions awaiting review.
-3. **Review:** an approval or rejection changes the simulated workflow state.
-4. **Record:** the local ledger records the result; recovery tests exercise interrupted work.
+2. **Check:** the server applies the amount rule and blocks requests awaiting review.
+3. **Review:** approve or reject the simulated invoice when a decision is needed.
+4. **Record:** the local ledger records the simulated result; recovery tests exercise interrupted work.
 
 ```mermaid
 flowchart LR
@@ -40,83 +31,83 @@ flowchart LR
   W --> L[(Local ledger)]
 ```
 
-## Evidence and limits
+The reviewer in the default demo is not authenticated. The rule is enforced in the local simulation; it is not a production authorization system.
 
-- **Implemented locally:** invoice gating, simulated effects, SQLite persistence, a PostgreSQL prototype, local MCP tests, offline SDK tests, recovery experiments and OpenTelemetry traces.
-- **Tested in GitHub Actions:** CI, a disposable PostgreSQL service, Docker smoke test, dependency audit, CodeQL and a secret scan. Check [Actions](../../actions) for the current commit; historical failures remain visible.
-- **Experimental only:** Foundry has not been tested with a live model from the application. AWS Bedrock is a mock contract and the Databricks SQL contains synthetic rows only. There is no live cloud integration or real cost monitoring.
-- **Not production security:** reviewer identity is not authenticated in the default app, event logs are mutable, isolation is not production-ready, and external exactly-once payments are not guaranteed. See [security boundaries](docs/SECURITY.md).
+## Get started
 
-Details: [security benchmark](benchmark/README.md) · [reliability lab](docs/RELIABILITY-LAB.md) · [local tracing](docs/EVALUATION-TRACING.md) · [MCP and agent experiment](docs/OPENAI-AGENT.md) · [performance methodology](benchmark/PERFORMANCE.md).
+**You need:** Node.js 24 or newer and npm. Docker Engine and Compose are optional. Use only a local machine and synthetic data.
 
-## Run locally
-
-Requires Node.js 24 or newer and npm. From this directory, run `npm ci`. Start the API with `npm run api`; in a second terminal run `npm run dev`, then open http://localhost:3000. Run `npm test` for policy and API tests. The API binds only to `127.0.0.1:4000`. Local demo data is stored under `data/`, which is excluded from Git.
-
-The project's `npm run dev`, `npm run build`, and `npm run start` commands disable Next.js developer telemetry. If you run the Next.js CLI directly, set `NEXT_TELEMETRY_DISABLED=1` yourself. This does not disable unrelated telemetry from other tools or your hosting environment. See [privacy design](docs/PRIVACY-DESIGN.md).
-
-On the development machine the native Next.js Windows compiler failed to load. The build was verified using the installed WASM package: in PowerShell set `$env:NEXT_TEST_WASM_DIR = (Resolve-Path 'node_modules\@next\swc-wasm-nodejs').Path`, then run `npm run build`. This is an internal Next.js test flag, not a portable deployment solution.
-
-### Docker quickstart (local only)
-
-With Docker Engine and the Compose plugin installed, run `docker compose up --build` and open `http://127.0.0.1:3000`. Stop with `docker compose down`; the named `ledger-data` volume retains the synthetic local ledger. `docker compose down -v` removes that volume and its demo data. The compose port is bound to host loopback. A GitHub Actions runner has built and smoke-tested the container; it has not been tested on every local machine. Do not expose the dashboard publicly.
-
-## Design
-
-```mermaid
-flowchart LR
-  U[Dashboard: Next.js] -->|local API proxy| A[Fastify API]
-  A --> P[Deterministic policy: amount > 500 EUR]
-  A --> D[(SQLite or PostgreSQL: invoices and events)]
-  A -. opt-in, unverified live .-> F[Microsoft Foundry agent]
+```sh
+npm ci
+npm run api
 ```
 
-Amounts are represented as integer cents. The server evaluates the threshold independently of the UI or model. Invoice creation and its event, and approval decisions and their events, are written in SQLite transactions. A decision is accepted only while an invoice is awaiting review. Tests cover the threshold, invalid inputs, repeat decisions, audit events and persistence across restart.
+In a second terminal:
 
-The recovery engine tracks queued, running and completed simulated jobs. On startup, running jobs are requeued and processed. The SQLite worker checks the invoice status again immediately before producing an effect; tests also inject an unauthorized queue entry and verify that restart cannot bypass review. A unique simulated effect per invoice makes replay safe **within this simulated ledger**. This does not provide exactly-once execution against a real payment system; that would require an external idempotency key and reconciliation. `POST /api/invoices/:id/simulate` refuses invoices awaiting approval. One test kills a local worker after it claims a job and verifies recovery after restart. Run only one API instance: startup recovery is not coordinated across replicas.
+```sh
+npm run dev
+```
 
-In SQLite mode, `GET /api/telemetry` exposes locally generated OpenTelemetry request, model-call, security-decision and recovery spans plus request, latency, model-call, token and security counters/histograms. Process CPU time and RSS/heap memory are measured locally. Up to 200 completed spans are held in process memory; no cloud exporter is configured, and data resets on restart. Prompt text, invoice data, credentials and model response text are excluded from telemetry. Tests verify trace correlation and error/block reporting. The dashboard shows a small local summary. Model tokens appear only when a provider returns usage; model prices are not estimated. PostgreSQL mode does not yet instrument OpenTelemetry.
+Open **http://localhost:3000**. The API binds to `127.0.0.1:4000`; SQLite demo data is stored in the ignored `data/` directory.
 
-### Agent Security Lab
+<details>
+<summary><strong>Run with Docker Compose instead</strong></summary>
 
-`tests/security-lab.test.mjs` exercises malicious instructions in simulated input and provider output, forged role hints, missing identity, forbidden roles, protected reads, and attempted execution before review. These are deterministic offline tests of the gateway, **not a live LLM prompt-injection benchmark**. The tests enable a simulated identity adapter with `requireIdentity: true`; the normal local demo deliberately has no authentication. In this test mode routes use a deny-by-default permission mapping, but the adapter is not a real identity provider and must not be used as production authorization. Never expose the local demo publicly.
+```sh
+docker compose up --build
+```
 
-`tests/tenant-lab.test.mjs` verifies cross-tenant read and action denial in an isolated offline test harness with separate stores and fake identities. It does **not** provide production tenant isolation to the application. See [security model](docs/SECURITY.md) and [operations guide](docs/OPERATIONS.md).
+Open http://127.0.0.1:3000. `docker compose down` stops the containers; the named volume retains demo data. Adding `-v` deletes that volume and its contents. The dashboard port is bound to host loopback. A GitHub Actions runner builds and smoke-tests this setup; it is not a production deployment.
 
-### Reliability tests
+</details>
 
-In addition to the synthetic benchmark, `tests/recovery.test.mjs` kills a real worker process after it claims a job and verifies recovery on restart. Another test starts four independent local worker processes to drain 30 jobs, repeats enqueue requests, and checks that every job, effect, and completion event occurs once. This covers the SQLite simulation with a single recovery coordinator, not concurrent API startups, PostgreSQL replica coordination, distributed failures, or exactly-once external payments.
+The project commands disable Next.js developer telemetry. Direct Next.js CLI calls bypass the wrapper; set `NEXT_TELEMETRY_DISABLED=1` yourself. This does not control telemetry from unrelated tools or hosting. See [privacy design](docs/PRIVACY-DESIGN.md).
 
-### Optional Foundry and PostgreSQL configuration
+## Run the labs
 
-Foundry is disabled by default, even if an endpoint is configured. The opt-in and Azure prerequisites are described in [the Foundry guide](docs/FOUNDRY.md). A future live call may cost money and must be authorized separately; no real model call has been validated. The output is advisory and cannot override the deterministic policy.
+| What to inspect | Command | What it covers |
+| --- | --- | --- |
+| Test suite | `npm test` | Policy, simulated actions, MCP, recovery and local security tests. |
+| Agent tool boundary | `node --test tests/mcp.test.mjs tests/tool-gateway.test.mjs` | Local MCP calls, approval enforcement and simulated effects. |
+| Recovery | `npm run lab:reliability` | Worker interruption, parallel local processes and simulated provider failures. |
+| Security dataset | `npm run benchmark:security -- holdout` | Synthetic cases against the local gateway; not a live model evaluation. |
+| Offline SDK demo | `npm run demo:showcase` | Scripted agent and simulated approval flow; no external model call. |
 
-Set `DATABASE_URL` to use PostgreSQL instead of SQLite. Use TLS with certificate verification for Azure. The PostgreSQL path creates its initial tables on startup; it is an initial prototype rather than a versioned migration system. The test `tests/postgres.test.mjs` runs only when `TEST_DATABASE_URL` points to a disposable PostgreSQL database. It passed against PostgreSQL 16 in GitHub Actions, but Azure PostgreSQL has not been tested.
+PostgreSQL tests require `TEST_DATABASE_URL` pointing to a **disposable** PostgreSQL database. They run against PostgreSQL 16 in GitHub Actions. Local process/network tests need loopback access. See the [evaluation guide](docs/EVALUATION-TRACING.md) and [benchmark methodology](benchmark/README.md).
 
-Run `npm run benchmark` for 100 isolated synthetic actions: 25 blocked high-value requests and 75 completed simulations, with 10 artificially interrupted job states replayed. This tests recovery of persisted state, not an actual process kill, concurrent load, cloud availability or external payment behavior. CI is defined in `.github/workflows/ci.yml`; consult this repository's Actions tab for the latest results. `docker compose up --build` runs the local demo on loopback with a persistent Docker volume; it is not a production deployment.
+## Status and limits
 
-## Security and scope
+| Area | Current state |
+| --- | --- |
+| **Actions and review** | Simulated invoices, local policy checks and reviewer decisions. Default demo decisions are unauthenticated. |
+| **Storage and recovery** | SQLite locally; PostgreSQL prototype integration-tested in CI. Recovery is a single-coordinator simulation, not exactly-once external payment execution. |
+| **Agents and MCP** | MCP client/server and OpenAI SDK experiments run locally with test identities. Foundry adapter is opt-in and has not been validated with a live model from this application. |
+| **Observability** | Bounded in-memory OpenTelemetry traces and metrics on the SQLite API path. Durable workflow events are mutable and are not a tamper-proof audit trail. |
+| **Other clouds** | Bedrock is a mock contract; Databricks SQL uses synthetic rows. Neither is a live cloud connection or cost-monitoring service. |
+| **Privacy** | Local demo notices and a voluntary age-group choice are prototypes, not age verification or a complete public-service privacy policy. Per-user isolation is not implemented. |
 
-- Synthetic data only. Approval actions are unauthenticated in this local prototype; audit events do not establish a verified human identity and are not tamper-proof.
-- Default storage is local SQLite, **not Azure PostgreSQL**. PostgreSQL has been tested in CI, not against Azure; Foundry's live model integration remains unverified. There is no Azure deployment, model cost telemetry or real identity-based access control. Local OpenTelemetry currently covers the SQLite API path only. AWS is not integrated.
-- There is no payment or financial-system integration. `processed` denotes a simulated workflow state.
-- Do not use with real invoices or expose the API or dashboard publicly. A deployable version needs authentication and authorization, CSRF protections, durable PostgreSQL transactions, identity-attributed audit records, secret management and operational monitoring.
+GitHub Actions runs the test suite, PostgreSQL integration, dependency audit, Docker smoke test, CodeQL and a secret scan. See the [Actions tab](../../actions) for the current commit. Passing scans and tests do not prove the system is secure.
 
-## Next milestones
+## Under the hood
 
-1. Add authenticated reviewers and authorization checks, with adversarial tests.
-2. Add versioned PostgreSQL migrations and test the adapter against Azure only with explicit budget controls.
-3. Verify the Foundry agent with managed identity against the actual project; treat model output as untrusted and never let it bypass the server policy.
-4. Add container deployment, budget-aware configuration, CI, monitoring and a reproducible Azure deployment guide.
+The dashboard uses Next.js and the API uses Fastify. Amounts are integer cents. SQLite stores invoice states, decisions and events; the worker rechecks eligibility before recording a simulated effect. A unique simulated effect per invoice makes replay safe **within this local ledger only**. Run one API instance: startup recovery is not coordinated across replicas.
 
-Security evaluation: see [benchmark methodology and reproducible datasets](benchmark/README.md).
+Foundry is disabled by default. A future live call can cost money and requires an authorized configuration and explicit opt-in; model output cannot override the server policy. The [Foundry guide](docs/FOUNDRY.md) documents the unverified adapter. PostgreSQL has no OpenTelemetry instrumentation in this prototype and requires versioned migrations before production.
 
-OpenAI Agents SDK offline integration and comparison: [documentation](docs/OPENAI-AGENT.md).
+<details>
+<summary><strong>Windows build note</strong></summary>
 
-Reliability challenge lab: [scenarios, results and safety limits](docs/RELIABILITY-LAB.md).
+On the development machine the native Next.js Windows compiler failed to load. A build was verified with the installed WASM package: in PowerShell set `$env:NEXT_TEST_WASM_DIR = (Resolve-Path 'node_modules\@next\swc-wasm-nodejs').Path`, then run `npm run build`. This is an internal Next.js test flag, not a portable deployment solution.
 
-Local measured performance and raw data: [benchmark protocol](benchmark/PERFORMANCE.md) and [report](benchmark/results/local-sanitized/REPORT.md).
+</details>
 
-Local evaluations and structured workflow traces: [documentation](docs/EVALUATION-TRACING.md).
+## Read more
 
-Research showcase: run `npm run demo:showcase` for the offline SDK and approval demo; see [article draft](showcase/TECHNICAL-ARTICLE.md), [recording plan](showcase/DEMO-SCRIPT.md) and [community drafts](showcase/COMMUNITY-DRAFTS.md).
+- [Architecture](docs/ARCHITECTURE.md) · [Security model](docs/SECURITY.md) · [Security policy](SECURITY.md)
+- [Reliability lab](docs/RELIABILITY-LAB.md) · [Evaluations and tracing](docs/EVALUATION-TRACING.md) · [Performance methodology](benchmark/PERFORMANCE.md)
+- [MCP and agent experiments](docs/OPENAI-AGENT.md) · [Foundry](docs/FOUNDRY.md) · [Multicloud experiments](docs/MULTICLOUD.md)
+- [Privacy design](docs/PRIVACY-DESIGN.md) · [Demo script](showcase/DEMO-SCRIPT.md) · [Technical article draft](showcase/TECHNICAL-ARTICLE.md)
+
+## License
+
+[MIT](LICENSE). Martenwatch is an educational prototype; no production-security or compliance certification is implied.
