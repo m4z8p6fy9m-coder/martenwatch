@@ -91,7 +91,7 @@ Foundry is disabled by default, even if an endpoint is configured. The opt-in an
 
 Set `DATABASE_URL` to use PostgreSQL instead of SQLite. Use TLS with certificate verification for Azure. The PostgreSQL path creates its initial tables on startup; it is an initial prototype rather than a versioned migration system. The test `tests/postgres.test.mjs` runs only when `TEST_DATABASE_URL` points to a disposable PostgreSQL database. It passed against PostgreSQL 16 in GitHub Actions, but Azure PostgreSQL has not been tested.
 
-Run `npm run benchmark` for 100 isolated synthetic actions: 25 blocked high-value requests and 75 completed simulations, with 10 artificially interrupted job states replayed. This tests recovery of persisted state, not an actual process kill, concurrent load, cloud availability or external payment behavior. CI is defined in `.github/workflows/ci.yml`; the [GitHub Actions run](https://github.com/m4z8p6fy9m-coder/actionledger-one/actions/runs/41524681622) passed tests, PostgreSQL integration, the synthetic benchmark, build and Docker smoke test. `docker compose up --build` runs the local demo on loopback with a persistent Docker volume; it is not a production deployment.
+Run `npm run benchmark` for 100 isolated synthetic actions: 25 blocked high-value requests and 75 completed simulations, with 10 artificially interrupted job states replayed. This tests recovery of persisted state, not an actual process kill, concurrent load, cloud availability or external payment behavior. CI is defined in `.github/workflows/ci.yml`; consult this repository's Actions tab for the latest results. `docker compose up --build` runs the local demo on loopback with a persistent Docker volume; it is not a production deployment.
 
 ## Security and scope
 
