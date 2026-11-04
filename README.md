@@ -14,6 +14,8 @@ Martenwatch (previously ActionLedger ONE) explores a narrow question: **what hap
 | --- | --- | --- | --- |
 | Local MCP and SDK experiments send simulated requests through a gateway. | A server-side rule checks the invoice independently of model output. | Local tests exercise interrupted processes, retries and parallel workers. | Events, traces and reproducible experiments show what the prototype did. |
 
+<p align="center"><img src="assets/martenwatch-workflow.png" alt="Woodcut illustration of a pine marten watching an invoice, a policy shield, a human reviewer, and a ledger" /></p>
+
 ## How it works
 
 1. **Propose:** create a synthetic invoice and request a simulated action.
