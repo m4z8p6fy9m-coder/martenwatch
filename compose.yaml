@@ -1,0 +1,9 @@
+services:
+  actionledger:
+    build: .
+    ports:
+      - "127.0.0.1:3000:3000"
+    volumes:
+      - ledger-data:/app/data
+volumes:
+  ledger-data:

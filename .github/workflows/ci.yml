@@ -1,0 +1,59 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: ci-test-password
+          POSTGRES_DB: actionledger_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      TEST_DATABASE_URL: postgresql://postgres:ci-test-password@localhost:5432/actionledger_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm audit --audit-level=high
+      - run: npm test
+      - name: Require PostgreSQL integration test
+        run: |
+          test -n "$TEST_DATABASE_URL"
+          node --test tests/postgres.test.mjs
+      - run: npm run benchmark
+      - run: npm run benchmark:security -- development
+      - run: npm run benchmark:security -- holdout
+      - run: npm run build
+  docker-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker compose build
+      - run: docker compose up -d
+      - name: Check dashboard and API
+        run: |
+          for i in $(seq 1 45); do
+            if curl --fail --silent http://127.0.0.1:3000/ >/dev/null && curl --fail --silent http://127.0.0.1:3000/api/invoices >/dev/null; then exit 0; fi
+            sleep 2
+          done
+          docker compose logs
+          exit 1
+      - if: always()
+        run: docker compose down -v

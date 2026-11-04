@@ -1,0 +1,25 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    groups:
+      opentelemetry:
+        patterns: ["@opentelemetry/*"]
+      npm-dependencies:
+        patterns: ["*"]
+        exclude-patterns: ["@opentelemetry/*"]
+    ignore:
+      # The 2.x trace SDK requires API <1.10; upgrade the stack together later.
+      - dependency-name: "@opentelemetry/api"
+        versions: [">=1.10.0"]
+      - dependency-name: "@opentelemetry/*"
+        update-types: ["version-update:semver-major"]
+    schedule:
+      interval: weekly
+  - package-ecosystem: github-actions
+    directory: /
+    groups:
+      github-actions:
+        patterns: ["*"]
+    schedule:
+      interval: weekly

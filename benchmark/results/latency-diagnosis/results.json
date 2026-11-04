@@ -1,0 +1,81 @@
+{
+  "measurement": "in-process serial SQLite, no network",
+  "samples": 150,
+  "warmup": 20,
+  "p50Ms": 50.10850000000028,
+  "p95Ms": 65.87519999999859,
+  "p99Ms": 81.91450000000077,
+  "slowest": [
+    {
+      "caseIndex": 138,
+      "createMs": 9.061400000000503,
+      "simulateMs": 101.4481999999989,
+      "totalMs": 110.50959999999941,
+      "cpuMs": 16
+    },
+    {
+      "caseIndex": 147,
+      "createMs": 10.315200000000914,
+      "simulateMs": 71.59929999999986,
+      "totalMs": 81.91450000000077,
+      "cpuMs": 47
+    },
+    {
+      "caseIndex": 133,
+      "createMs": 9.460399999999936,
+      "simulateMs": 69.65250000000015,
+      "totalMs": 79.11290000000008,
+      "cpuMs": 31
+    },
+    {
+      "caseIndex": 137,
+      "createMs": 9.757200000000012,
+      "simulateMs": 66.83559999999852,
+      "totalMs": 76.59279999999853,
+      "cpuMs": 30
+    },
+    {
+      "caseIndex": 139,
+      "createMs": 10.456600000001345,
+      "simulateMs": 65.89369999999872,
+      "totalMs": 76.35030000000006,
+      "cpuMs": 47
+    },
+    {
+      "caseIndex": 143,
+      "createMs": 11.582000000000335,
+      "simulateMs": 57.1242000000002,
+      "totalMs": 68.70620000000054,
+      "cpuMs": 16
+    },
+    {
+      "caseIndex": 4,
+      "createMs": 17.05119999999988,
+      "simulateMs": 50.31919999999991,
+      "totalMs": 67.37039999999979,
+      "cpuMs": 31
+    },
+    {
+      "caseIndex": 49,
+      "createMs": 10.258399999998801,
+      "simulateMs": 55.616799999999785,
+      "totalMs": 65.87519999999859,
+      "cpuMs": 16
+    },
+    {
+      "caseIndex": 142,
+      "createMs": 22.505199999999604,
+      "simulateMs": 40.05419999999867,
+      "totalMs": 62.55939999999828,
+      "cpuMs": 31
+    },
+    {
+      "caseIndex": 2,
+      "createMs": 11.329600000000028,
+      "simulateMs": 48.88500000000022,
+      "totalMs": 60.214600000000246,
+      "cpuMs": 16
+    }
+  ],
+  "note": "Process CPU includes both workload driver and server; wall-minus-CPU can include disk waits, scheduling, garbage collection and other effects. Phase timings localize the delay but do not independently prove root cause."
+}

@@ -1,0 +1,147 @@
+{
+  "schemaVersion": 1,
+  "generatedAtUtc": "2026-11-02T20:40:44.348Z",
+  "gitCommit": null,
+  "gitDirty": null,
+  "sourceSha256": {
+    "api/app.mjs": "4474302015d3b1d9348ddc91b1ab25130e74e55c9fa4cff4c3cd96fe5788af01",
+    "api/recovery.mjs": "26df385405c357783c303575021a9de61d61363e638de11fe17184163d955c8b",
+    "api/policy.mjs": "4ac2820cf0a0db6854ea2d4d92bafe04167d4e40b0c6667e88c851b405300a12",
+    "api/telemetry.mjs": "5410e50272b4961d1455b3c7374de5840756440bf37566ed6a375e429b255867",
+    "scripts/perf-baseline.mjs": "6865284ec42e8abb41589620fee5699a3158f95122509942f229a55438de4d19",
+    "scripts/perf-worker.mjs": "1fde08170dad90a728731f001d9122437bc87b5f8c3cf9567f92e88a9b40a3d0",
+    "scripts/performance-report.mjs": "e1b9180caf13fd4e0ac45b8ce65e290d0eecc67721252c29af310ea498274a72",
+    "tests/fixtures/interrupted-worker.mjs": "042bc8b472d80ef1070097fef520bce1cafe6dae2d8de5ab0310995a31331e75",
+    "package-lock.json": "f7db8de4c0d72652db1a96aa7935b103769fcb447359143b2684a76044e91631"
+  },
+  "environment": {
+    "node": "v24.19.0",
+    "os": "win32",
+    "osRelease": "10.0.26300",
+    "architecture": "x64",
+    "cpuModel": "AMD Ryzen 5 2600 Six-Core Processor            ",
+    "logicalCpus": 12,
+    "totalMemoryGiB": 15.934
+  },
+  "method": {
+    "runCountPerMode": 3,
+    "warmupWorkflows": 20,
+    "measuredWorkflowsPerRun": 120,
+    "concurrency": 1,
+    "workload": "Create and simulate a valid below-threshold synthetic invoice over two in-process Fastify injections, persisted in local SQLite.",
+    "quantile": "nearest rank",
+    "ordering": "alternating baseline-first and ledger-first",
+    "rss": "sampled in worker process including Node runtime and workload driver, includes warmup",
+    "cpu": "process CPU time delta across measured workload, including workload driver",
+    "baseline": "minimal Fastify/SQLite; no authorization, approval, audit, recovery, or OTel",
+    "recovery": "kill signal to completed local in-process startup, includes process exit; baseline does not implement recovery"
+  },
+  "summary": {
+    "baseline": {
+      "samples": 360,
+      "p50Ms": 14.8,
+      "p95Ms": 18.44,
+      "p99Ms": 64.418,
+      "throughputWorkflowsPerSecond": 60.174,
+      "errors": 0,
+      "errorRatePercent": 0,
+      "cpuSeconds": 2.859,
+      "cpuTimePerWorkflowMs": 7.942,
+      "peakRssMiB": 77.551
+    },
+    "ledger": {
+      "samples": 360,
+      "p50Ms": 47.885,
+      "p95Ms": 55.922,
+      "p99Ms": 495.039,
+      "throughputWorkflowsPerSecond": 16.946,
+      "errors": 0,
+      "errorRatePercent": 0,
+      "cpuSeconds": 8.016,
+      "cpuTimePerWorkflowMs": 22.267,
+      "peakRssMiB": 89.219
+    }
+  },
+  "runs": [
+    {
+      "mode": "baseline",
+      "run": 1,
+      "elapsedMs": 1811.5240000000001,
+      "cpuUserMs": 125,
+      "cpuSystemMs": 750,
+      "peakRssBytes": 81317888
+    },
+    {
+      "mode": "ledger",
+      "run": 1,
+      "elapsedMs": 5869.621899999999,
+      "cpuUserMs": 719,
+      "cpuSystemMs": 2156,
+      "peakRssBytes": 93184000
+    },
+    {
+      "mode": "ledger",
+      "run": 2,
+      "elapsedMs": 5787.629000000001,
+      "cpuUserMs": 500,
+      "cpuSystemMs": 2062,
+      "peakRssBytes": 93552640
+    },
+    {
+      "mode": "baseline",
+      "run": 2,
+      "elapsedMs": 1770.4228,
+      "cpuUserMs": 171,
+      "cpuSystemMs": 719,
+      "peakRssBytes": 81285120
+    },
+    {
+      "mode": "baseline",
+      "run": 3,
+      "elapsedMs": 2400.6565,
+      "cpuUserMs": 172,
+      "cpuSystemMs": 922,
+      "peakRssBytes": 81248256
+    },
+    {
+      "mode": "ledger",
+      "run": 3,
+      "elapsedMs": 9587.004600000002,
+      "cpuUserMs": 594,
+      "cpuSystemMs": 1985,
+      "peakRssBytes": 82853888
+    }
+  ],
+  "recoveries": [
+    {
+      "trial": 1,
+      "recoveryMs": 37.96800000000076,
+      "effects": 1,
+      "completed": 1
+    },
+    {
+      "trial": 2,
+      "recoveryMs": 36.091999999996915,
+      "effects": 1,
+      "completed": 1
+    },
+    {
+      "trial": 3,
+      "recoveryMs": 35.17930000000342,
+      "effects": 1,
+      "completed": 1
+    },
+    {
+      "trial": 4,
+      "recoveryMs": 36.31570000000647,
+      "effects": 1,
+      "completed": 1
+    },
+    {
+      "trial": 5,
+      "recoveryMs": 34.30550000000221,
+      "effects": 1,
+      "completed": 1
+    }
+  ]
+}
