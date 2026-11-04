@@ -53,6 +53,8 @@ Details: [security benchmark](benchmark/README.md) · [reliability lab](docs/REL
 
 Requires Node.js 24 or newer and npm. From this directory, run `npm ci`. Start the API with `npm run api`; in a second terminal run `npm run dev`, then open http://localhost:3000. Run `npm test` for policy and API tests. The API binds only to `127.0.0.1:4000`. Local demo data is stored under `data/`, which is excluded from Git.
 
+The project's `npm run dev`, `npm run build`, and `npm run start` commands disable Next.js developer telemetry. If you run the Next.js CLI directly, set `NEXT_TELEMETRY_DISABLED=1` yourself. This does not disable unrelated telemetry from other tools or your hosting environment. See [privacy design](docs/PRIVACY-DESIGN.md).
+
 On the development machine the native Next.js Windows compiler failed to load. The build was verified using the installed WASM package: in PowerShell set `$env:NEXT_TEST_WASM_DIR = (Resolve-Path 'node_modules\@next\swc-wasm-nodejs').Path`, then run `npm run build`. This is an internal Next.js test flag, not a portable deployment solution.
 
 ### Docker quickstart (local only)
