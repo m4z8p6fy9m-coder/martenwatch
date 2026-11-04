@@ -1,15 +1,7 @@
 'use client';
 import {useState} from 'react';
-
+import {useLanguage,pick} from './language';
 export default function PrivacyNotice(){
- const [ageRange,setAgeRange]=useState('');
- return <section className="privacy-notice" aria-label="Datenschutz und Altersangabe">
-  <div><b>Datenschutz in dieser Demo</b><p>Nur erfundene Daten eingeben. Kein Werbe- oder Analysetracking ist eingerichtet; technische Messwerte bleiben lokal im API-Prozess. <a href="/privacy">Datenschutzhinweise lesen</a></p></div>
-  <label>Altersgruppe (freiwillig, nur in dieser Ansicht)
-   <select value={ageRange} onChange={e=>setAgeRange(e.target.value)}>
-    <option value="">Keine Angabe</option><option value="under16">Unter 16</option><option value="16plus">16 oder älter</option>
-   </select>
-  </label>
-  {ageRange && <p>Die Angabe wird nicht gespeichert oder geprüft. Sie ist keine Altersverifikation und keine Einwilligung der Erziehungsberechtigten.</p>}
- </section>;
+ const [ageRange,setAgeRange]=useState('');const {lang}=useLanguage();const t=(de,en)=>pick(lang,de,en);
+ return <section className="privacy-notice" aria-label={t('Datenschutz und Altersangabe','Privacy and age information')}><div><b>{t('Datenschutz in dieser Demo','Privacy in this demo')}</b><p>{t('Nur erfundene Daten eingeben. Kein Werbe- oder Analysetracking ist eingerichtet; technische Messwerte bleiben lokal im API-Prozess.','Use synthetic data only. No advertising or analytics tracking is configured; technical metrics stay in the local API process.')} <a href="/privacy">{t('Datenschutzhinweise lesen','Read the privacy notice')}</a></p></div><label>{t('Altersgruppe (freiwillig, nur in dieser Ansicht)','Age group (optional, only in this view)')}<select value={ageRange} onChange={e=>setAgeRange(e.target.value)}><option value="">{t('Keine Angabe','Prefer not to say')}</option><option value="under16">{t('Unter 16','Under 16')}</option><option value="16plus">{t('16 oder älter','16 or older')}</option></select></label>{ageRange&&<p>{t('Die Angabe wird nicht gespeichert oder geprüft. Sie ist keine Altersverifikation und keine Einwilligung der Erziehungsberechtigten.','This choice is neither stored nor verified. It is not age verification or parental consent.')}</p>}</section>
 }
